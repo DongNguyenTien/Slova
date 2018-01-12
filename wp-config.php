@@ -26,7 +26,7 @@ define('DB_NAME', 'slova');
 define('DB_USER', 'root');
 
 /** MySQL database password */
-define('DB_PASSWORD', '');
+define('DB_PASSWORD', 'passthepast');
 
 /** MySQL hostname */
 define('DB_HOST', '127.0.0.1');
@@ -84,10 +84,12 @@ $table_prefix  = 'wp_';
 define('WP_DEBUG', false);
 
 /* That's all, stop editing! Happy blogging. */
-
+define( 'WP_ALLOW_REPAIR', true );
+define( 'FS_METHOD', 'direct' );
 /** Absolute path to the WordPress directory. */
 if ( !defined('ABSPATH') )
 	define('ABSPATH', dirname(__FILE__) . '/');
 
 /** Sets up WordPress vars and included files. */
 require_once(ABSPATH . 'wp-settings.php');
+

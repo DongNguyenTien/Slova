@@ -1,7 +1,6 @@
 <?php
 
-if (!defined('ABSPATH'))
-    exit;
+defined('ABSPATH') || exit;
 
 class NewsletterModule {
 
@@ -80,7 +79,7 @@ class NewsletterModule {
             $this->available_version = get_option($this->prefix . '_available_version');
         }
     }
-    
+
     /**
      * Exceutes a query and log it.
      */
@@ -89,7 +88,7 @@ class NewsletterModule {
 
         $this->log($query, 3);
         return $wpdb->query($query);
-    }    
+    }
 
     function first_install() {
         
@@ -313,7 +312,8 @@ class NewsletterModule {
      * returns false.
      */
     static function normalize_email($email) {
-        if (!is_string($email)) return false;
+        if (!is_string($email))
+            return false;
         $email = strtolower(trim($email));
         if (!is_email($email)) {
             return false;
@@ -338,7 +338,8 @@ class NewsletterModule {
 
     static function is_email($email, $empty_ok = false) {
 
-        if (!is_string($email)) return false;
+        if (!is_string($email))
+            return false;
         $email = strtolower(trim($email));
 
         if ($email == '') {
@@ -602,7 +603,7 @@ class NewsletterModule {
         if ($type == null) {
             $list = $wpdb->get_results("select * from " . NEWSLETTER_EMAILS_TABLE . " order by id desc", $format);
         } else {
-            $type = (string)$type;
+            $type = (string) $type;
             $list = $wpdb->get_results($wpdb->prepare("select * from " . NEWSLETTER_EMAILS_TABLE . " where type=%s order by id desc", $type), $format);
         }
         if ($wpdb->last_error) {
@@ -623,17 +624,21 @@ class NewsletterModule {
      */
     function get_email($id, $format = OBJECT) {
         $email = $this->store->get_single(NEWSLETTER_EMAILS_TABLE, $id, $format);
+        if (!$email)
+            return $email;
         if ($format == OBJECT) {
             $email->options = maybe_unserialize($email->options);
-            if (!is_array($email->options)) $email->options = array();
+            if (!is_array($email->options))
+                $email->options = array();
         } else if ($format == ARRAY_A) {
             $email['options'] = maybe_unserialize($email['options']);
-            if (!is_array($email['options'])) $email['options'] = array();
+            if (!is_array($email['options']))
+                $email['options'] = array();
         }
         return $email;
     }
-    
-    /** 
+
+    /**
      * Save an email and provide serialization, if needed, of $email['options']. 
      */
     function save_email($email, $return_format = OBJECT) {
@@ -652,10 +657,12 @@ class NewsletterModule {
         $email = $this->store->save(NEWSLETTER_EMAILS_TABLE, $email, $return_format);
         if ($return_format == OBJECT) {
             $email->options = maybe_unserialize($email->options);
-            if (!is_array($email->options)) $email->options = array();
+            if (!is_array($email->options))
+                $email->options = array();
         } else if ($return_format == ARRAY_A) {
             $email['options'] = maybe_unserialize($email['options']);
-            if (!is_array($email['options'])) $email['options'] = array();
+            if (!is_array($email['options']))
+                $email['options'] = array();
         }
         return $email;
     }
@@ -666,7 +673,7 @@ class NewsletterModule {
 
     function get_email_field($id, $field_name) {
         return $this->store->get_field(NEWSLETTER_EMAILS_TABLE, $id, $field_name);
-    }    
+    }
 
     function get_email_status_label($email) {
         switch ($email->status) {
@@ -778,7 +785,7 @@ class NewsletterModule {
         }
         return $r;
     }
-    
+
     /**
      * Return the user identified by the "nk" parameter (POST or GET).
      * If no user can be found, returns null. 
@@ -802,7 +809,7 @@ class NewsletterModule {
             }
         }
         return $user;
-    }    
+    }
 
     function get_list($id) {
         global $wpdb;
@@ -866,14 +873,14 @@ class NewsletterModule {
             return $content;
         }
     }
-    
+
     /**
      * Returns a list of users marked as "test user".
      * @return array
      */
     function get_test_users() {
         return $this->store->get_all(NEWSLETTER_USERS_TABLE, "where test=1");
-    }    
+    }
 
     function delete_user($id) {
         global $wpdb;
@@ -892,7 +899,7 @@ class NewsletterModule {
      */
     function set_user_status($id_or_email, $status) {
         global $wpdb;
-        $status = (string)$status;
+        $status = (string) $status;
         $this->logger->debug('Status change to ' . $status . ' of subscriber ' . $id_or_email . ' from ' . $_SERVER['REQUEST_URI']);
 
         $id_or_email = strtolower(trim($id_or_email));
@@ -920,25 +927,41 @@ class NewsletterModule {
     function get_user_by_wp_user_id($wp_user_id, $format = OBJECT) {
         return $this->store->get_single_by_field(NEWSLETTER_USERS_TABLE, 'wp_user_id', $wp_user_id, $format);
     }
-    
+
     /**
-     * Replace any kind of newsletter placeholder in a text.
+     * Replaces every possible Newsletter tag ({...}) in a piece of text or HTML.
+     * 
+     * @global wpdb $wpdb
+     * @param string $text
+     * @param mixed $user Can be an object, associative array or id
+     * @param mixed $email Can be an object, associative array or id
+     * @param type $referrer
+     * @return type
      */
-    function replace($text, $user = null, $email_id = null, $referrer = null) {
+    function replace($text, $user = null, $email = null, $referrer = null) {
         global $wpdb;
 
         //$this->logger->debug('Replace start');
-        if (is_array($user)) {
-            $user = $this->get_user($user['id']);
+        if ($user !== null && !is_object($user)) {
+            if (is_array($user)) {
+                $user = (object) $user; //$this->get_user($user['id']);
+            } else if (is_numeric($user)) {
+                $user = $this->get_user($user);
+            } else {
+                $user = null;
+            }
         }
 
-        $email = null;
-        if (is_object($email_id)) {
-            $email = $email_id;
-            $email_id = $email->id;
-        } else if (is_numeric($email_id)) {
-            $email = $this->get_email($email_id);
+        if ($email !== null && !is_object($email)) {
+            if (is_array($email)) {
+                $email = (object) $email; //$this->get_user($user['id']);
+            } else if (is_numeric($email)) {
+                $email = $this->get_email($email);
+            } else {
+                $email = null;
+            }
         }
+
 
         $text = apply_filters('newsletter_replace', $text, $user, $email);
 
@@ -950,7 +973,7 @@ class NewsletterModule {
 
         $text = $this->replace_date($text);
 
-        if ($user != null) {
+        if ($user) {
             $options_profile = get_option('newsletter_profile');
 
             $text = str_replace('{email}', $user->email, $text);
@@ -1015,15 +1038,14 @@ class NewsletterModule {
 
             $home_url = home_url('/');
             //$text = $this->replace_url($text, 'SUBSCRIPTION_CONFIRM_URL', self::add_qs(plugins_url('do.php', __FILE__), 'a=c' . $id_token));
-            
+
             $text = $this->replace_url($text, 'SUBSCRIPTION_CONFIRM_URL', $home_url . '?na=c&nk=' . $nk);
             $text = $this->replace_url($text, 'ACTIVATION_URL', $home_url . '?na=c&nk=' . $nk);
-            
+
             $text = $this->replace_url($text, 'UNSUBSCRIPTION_CONFIRM_URL', $home_url . '?na=uc&nk=' . $nk . ($email ? '&nek=' . $email->id : ''));
             //$text = $this->replace_url($text, 'UNSUBSCRIPTION_CONFIRM_URL', NEWSLETTER_URL . '/do/unsubscribe.php?nk=' . $nk);
             $text = $this->replace_url($text, 'UNSUBSCRIPTION_URL', $home_url . '?na=u&nk=' . $nk . ($email ? '&nek=' . $email->id : ''));
 //            $text = $this->replace_url($text, 'CHANGE_URL', plugins_url('newsletter/do/change.php'));
-
             // Obsolete.
             $text = $this->replace_url($text, 'FOLLOWUP_SUBSCRIPTION_URL', self::add_qs($base, 'nm=fs' . $id_token));
             $text = $this->replace_url($text, 'FOLLOWUP_UNSUBSCRIPTION_URL', self::add_qs($base, 'nm=fu' . $id_token));
@@ -1040,7 +1062,6 @@ class NewsletterModule {
             if (!empty($email_id)) {
                 $text = $this->replace_url($text, 'EMAIL_URL', $home_url . '?na=v&id=' . $email_id . '&amp;nk=' . $nk);
             }
-
         } else {
             $text = $this->replace_url($text, 'SUBSCRIPTION_CONFIRM_URL', '#');
             $text = $this->replace_url($text, 'ACTIVATION_URL', '#');
@@ -1062,7 +1083,7 @@ class NewsletterModule {
         //$this->logger->debug('Replace end');
         return $text;
     }
-    
+
     function replace_date($text) {
         $text = str_replace('{date}', date_i18n(get_option('date_format')), $text);
 
@@ -1076,7 +1097,7 @@ class NewsletterModule {
             $text = substr($text, 0, $x) . date($f) . substr($text, $y + 1);
         }
         return $text;
-    }    
+    }
 
     function replace_url($text, $tag, $url) {
         $home = trailingslashit(home_url());
@@ -1094,7 +1115,6 @@ class NewsletterModule {
 
         return $text;
     }
-    
 
     public static function antibot_form_check() {
         return strtolower($_SERVER['REQUEST_METHOD']) == 'post' && isset($_POST['ts']) && time() - $_POST['ts'] < 30;
