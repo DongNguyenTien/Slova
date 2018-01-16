@@ -5,15 +5,15 @@
 <!-- Start Header -->
 <header>
 	<div class="ro-header-v1 <?php echo esc_attr($cl_stick); ?>">
-		<div class="row">
+		<div class="row" id="main-menu">
 			<div class="container">
-				<div class="col-md-3 ro-logo">
+				<div class="col-md-2 ro-logo">
 					<a href="<?php echo esc_url(home_url()); ?>">
 						<?php ro_theme_logo(); ?>
 					</a>
 					<div id="ro-hamburger" class="ro-hamburger visible-xs visible-sm"><i class="icon icon-menu"></i></div>
 				</div>
-				<div class="col-md-9">
+				<div class="col-md-10">
 					<?php
 						$manage_location = $tb_options['tb_manage_location'];
 						$arr = array(

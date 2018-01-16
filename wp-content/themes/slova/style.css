@@ -4220,7 +4220,7 @@ body .ro-skill-section .vc_pie_chart:hover .vc_pie_chart_value { color:#ffffff; 
     -o-animation:fadeInUp 0.4s both;
     animation:fadeInUp 0.4s both;
   }
-  .ro-header-v1 .ro-menu-sidebar-active { padding-right:110px; }
+  .ro-header-v1 .ro-menu-sidebar-active { padding-right:10px; }
 }
 @media (max-width: 991px) {
   .ro-header-v1 { padding:30px 0; }
@@ -4377,7 +4377,7 @@ body .ro-skill-section .vc_pie_chart:hover .vc_pie_chart_value { color:#ffffff; 
   background:-webkit-linear-gradient(top,rgba(163,96,255,0.9) 0%,rgba(0,132,255,0.9) 100%);
   background:-o-linear-gradient(top,rgba(163,96,255,0.9) 0%,rgba(0,132,255,0.9) 100%);
   background:-ms-linear-gradient(top,rgba(163,96,255,0.9) 0%,rgba(0,132,255,0.9) 100%);
-  background:linear-gradient(to bottom,rgba(163,96,255,0.9) 0%,rgba(0,132,255,0.9) 100%);
+  background:linear-gradient(to bottom,rgba(239,203,89,0.9) 0%,rgba(239,203,89,0.9) 100%);
 }
 .ro-footer .ro-footer-top { padding:80px 0 25px; }
 .ro-footer .ro-footer-top .wg-title {
@@ -11269,3 +11269,39 @@ body .ro-skill-section .vc_pie_chart:hover .vc_pie_chart_value { color:#ffffff; 
   font-size:24px;
   color:rgba(45,55,69,0.75);
 }
+
+#ro-search-form  {
+  display: none;
+}
+
+#nav > li > a {
+  font-family: 'Mitr', sans-serif;
+  color: black;
+  background-color: #f0cc5a;
+  margin-right: 10px;
+  margin-top: 20px;
+}
+
+#nav > li > a:hover {
+  background-color: #f89f1d;
+}
+
+.ro-header-v1, .container-fluid, #main-menu {
+  background-color: white;
+}
+
+div.ro-section-title-bar.text-center {
+  padding-top: 100px;
+  padding-bottom: 0px;
+}
+
+div.main-content {
+  margin-top: 100px;
+}
+
+div.ro-header-v1.ro-header-stick {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+

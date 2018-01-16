@@ -363,7 +363,7 @@
 			<div class="ro-section-title-bar text-center">
 				<div class="container">
 					<div class="row">
-						<div class="col-md-12">
+						<div class="col-md-12" style="display:none;">
 							<?php
 								$title_bar_icon = get_post_meta(get_the_ID(), 'tb_title_bar_icon', true);
 								if(!$title_bar_icon) $title_bar_icon = "fa fa-pencil";
@@ -375,7 +375,7 @@
 					</div>
 				</div>
 			</div>
-			<?php 
+			<?php
 			}
 		}
 	}
